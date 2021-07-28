@@ -1,9 +1,9 @@
-package com.pjunit.pjunitengine;
+package com.pjunit.pjunitengine.assertions;
 
-import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 public final class Assertions {
@@ -35,7 +35,7 @@ public final class Assertions {
     }
 
     public static <T extends Number> void assertNumberEquals(T expected, T actual) {
-        Objects.requireNonNull(expected);
+        requireNonNull(expected);
         if (expected.equals(actual)) return;
 
         throw new AssertionError(

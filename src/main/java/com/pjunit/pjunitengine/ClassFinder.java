@@ -13,21 +13,15 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
-class TestEngine {
+final class ClassFinder {
 
-    private static final Logger LOGGER = Logger.getLogger(TestEngine.class.getSimpleName());
+    private ClassFinder() {}
 
-    private TestEngine() {}
+    private static final Logger LOGGER = Logger.getLogger(ClassFinder.class.getSimpleName());
 
-    public static void main(String[] args) {
-        String packageName = args.length == 0 ? "com.pjunit.pjunitengine.test" : args[0];
-        TestExecutor.getExecutor()
-                .executeAllTests(findAllClassesUsingClassLoader(packageName));
-    }
-
-    private static Set<Class<?>> findAllClassesUsingClassLoader(String packageName) {
+    static Set<Class<?>> findAllTestClasses(String packageName) {
         InputStream stream = ClassLoader.getSystemClassLoader()
-                .getResourceAsStream(packageName.replaceAll("[.]", "/"));
+                .getResourceAsStream(normalizePackageName(packageName));
         var reader = new BufferedReader(new InputStreamReader(requireNonNull(stream)));
         return reader.lines()
                 .filter(line -> line.endsWith(".class"))
@@ -35,6 +29,10 @@ class TestEngine {
                 .filter(Objects::nonNull)
                 .filter(clazz -> clazz.isAnnotationPresent(PJunitTest.class))
                 .collect(Collectors.toSet());
+    }
+
+    private static String normalizePackageName(final String packageName) {
+        return packageName.replaceAll("[.]", "/");
     }
 
     private static Class<?> getClass(String className, String packageName) {

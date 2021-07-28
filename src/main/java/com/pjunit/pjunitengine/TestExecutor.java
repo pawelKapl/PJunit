@@ -13,10 +13,8 @@ import java.util.logging.Logger;
 import static java.lang.String.format;
 
 final class TestExecutor {
-    private static final Logger LOGGER = Logger.getLogger(TestExecutor.class.getSimpleName());
 
-    private int passed = 0;
-    private int failed = 0;
+    private static final Logger LOGGER = Logger.getLogger(TestExecutor.class.getSimpleName());
 
     private TestExecutor() {
     }
@@ -26,22 +24,21 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        passed = 0;
-        failed = 0;
-
+        final var results = new int[2];
         testClasses.forEach(testClazz -> {
             for (Method method : testClazz.getDeclaredMethods()) {
                 Arrays.stream(method.getDeclaredAnnotations())
-                        .map(TestHandling::parseClazz)
+                        .map(TestHandler::getHandler)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
-                        .forEach(testHandler -> {
-                            if (testHandler.handle(method, prepareTestClass(testClazz))) passed++;
-                            else failed++;
+                        .forEach(handler -> {
+                            if (handler.handleTest(method, prepareTestClass(testClazz))) results[0]++;
+                            else results[1]++;
                         });
             }
         });
-        LOGGER.info(format("SUMMARY - Test passed: %d, Tests failed: %d", passed, failed));
+        LOGGER.info(format("SUMMARY - Test passed: %d, Tests failed: %d",
+                results[0], results[1]));
     }
 
     private Object prepareTestClass(Class<?> testClazz) {

@@ -1,6 +1,6 @@
 package com.pjunit.pjunitengine.test;
 
-import com.pjunit.pjunitengine.Assertions;
+import com.pjunit.pjunitengine.assertions.Assertions;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.PJunitTest;
 import com.pjunit.pjunitengine.annotations.Test;
