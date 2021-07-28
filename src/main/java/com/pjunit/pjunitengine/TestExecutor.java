@@ -1,4 +1,4 @@
-package com.pjunit.main.pjunitengine;
+package com.pjunit.pjunitengine;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

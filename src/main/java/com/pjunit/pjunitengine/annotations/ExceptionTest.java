@@ -1,4 +1,4 @@
-package com.pjunit.main.pjunitengine.annotations;
+package com.pjunit.pjunitengine.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

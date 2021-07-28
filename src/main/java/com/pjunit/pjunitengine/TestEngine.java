@@ -1,8 +1,9 @@
-package com.pjunit.main.pjunitengine;
+package com.pjunit.pjunitengine;
 
-import com.pjunit.main.pjunitengine.annotations.PJunitTest;
+import com.pjunit.pjunitengine.annotations.PJunitTest;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
@@ -20,7 +21,8 @@ class TestEngine {
     private TestEngine() {}
 
     public static void main(String[] args) {
-        String packageName = args.length == 0 ? "com.pjunit.test" : args[0];
+        String packageName = args.length == 0 ? "com.pjunit.pjunitengine.test" : args[0];
+
         TestExecutor
                 .getExecutor()
                 .executeAllTests(findAllClassesUsingClassLoader(packageName));

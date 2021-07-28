@@ -1,4 +1,4 @@
-package com.pjunit.main.pjunitengine.annotations;
+package com.pjunit.pjunitengine.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,6 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface PJunitTest {
+@Target(ElementType.METHOD)
+public @interface Test {
 }

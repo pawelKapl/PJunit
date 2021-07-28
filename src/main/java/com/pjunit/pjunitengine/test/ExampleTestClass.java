@@ -1,10 +1,9 @@
-package com.pjunit.test;
+package com.pjunit.pjunitengine.test;
 
-import com.pjunit.main.pjunitengine.annotations.ExceptionTest;
-import com.pjunit.main.pjunitengine.annotations.PJunitTest;
-import com.pjunit.main.pjunitengine.annotations.Test;
-
-import static com.pjunit.main.pjunitengine.Assertions.*;
+import com.pjunit.pjunitengine.Assertions;
+import com.pjunit.pjunitengine.annotations.ExceptionTest;
+import com.pjunit.pjunitengine.annotations.PJunitTest;
+import com.pjunit.pjunitengine.annotations.Test;
 
 @PJunitTest
 public class ExampleTestClass {
@@ -18,21 +17,21 @@ public class ExampleTestClass {
         double pow = Math.pow(i, 2.0);
 
         //then
-        assertNumberEquals(36.0, pow);
+        Assertions.assertNumberEquals(36.0, pow);
     }
 
     @Test
     public static void testIfTwoIntegerObjectsNotTheSame() {
         Integer a = 128;
         Integer b = 128;
-        assertFalse(a == b);
+        Assertions.assertFalse(a == b);
     }
 
     @Test
     public static void testIfTwoCachedIntegerObjectsAreTheSame() {
         Integer a = 127;
         Integer b = 127;
-        assertTrue(a == b);
+        Assertions.assertTrue(a == b);
     }
 
     @ExceptionTest({NumberFormatException.class})

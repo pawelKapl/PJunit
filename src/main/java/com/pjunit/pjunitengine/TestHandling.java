@@ -1,7 +1,7 @@
-package com.pjunit.main.pjunitengine;
+package com.pjunit.pjunitengine;
 
-import com.pjunit.main.pjunitengine.annotations.ExceptionTest;
-import com.pjunit.main.pjunitengine.annotations.Test;
+import com.pjunit.pjunitengine.annotations.ExceptionTest;
+import com.pjunit.pjunitengine.annotations.Test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
