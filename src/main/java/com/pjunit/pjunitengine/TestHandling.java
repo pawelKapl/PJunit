@@ -18,9 +18,9 @@ enum TestHandling {
 
     TEST(Test.class) {
         @Override
-        boolean handle(final Method method) {
+        boolean handle(final Method method, final Object testClass) {
             try {
-                method.invoke(null);
+                method.invoke(testClass);
                 LOGGER.log(Level.INFO, format("Test %s passed!", method.getName()));
                 return true;
             } catch (InvocationTargetException e) {
@@ -35,10 +35,10 @@ enum TestHandling {
 
     EXCEPTION_TEST(ExceptionTest.class) {
         @Override
-        boolean handle(final Method method) {
+        boolean handle(final Method method, final Object testClass) {
             Class<? extends Exception>[] possibleExceptions = method.getAnnotation(ExceptionTest.class).value();
             try {
-                method.invoke(null);
+                method.invoke(testClass);
                 LOGGER.warning(format("Test %s failed, no exceptions thrown during execution!", method.getName()));
                 return false;
             } catch (Exception wrappedExc) {
@@ -65,7 +65,7 @@ enum TestHandling {
         this.annotation = annotation;
     }
 
-    abstract boolean handle(Method method);
+    abstract boolean handle(Method method, Object testClass);
 
     static Optional<TestHandling> parseClazz(Annotation annotation) {
         return stream(values())
