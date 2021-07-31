@@ -1,10 +1,10 @@
-package com.pjunit.pjunitengine.test;
+package com.pjunit.pjunitengine;
 
-import com.pjunit.pjunitengine.assertions.Assertions;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.PJunitTest;
 import com.pjunit.pjunitengine.annotations.Test;
 import com.pjunit.pjunitengine.annotations.Warmup;
+import com.pjunit.pjunitengine.assertions.Assertions;
 
 @PJunitTest
 public class ExampleTestClass {

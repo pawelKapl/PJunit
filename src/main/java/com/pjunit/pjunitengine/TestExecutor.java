@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static java.lang.String.format;
 
 final class TestExecutor {
 
