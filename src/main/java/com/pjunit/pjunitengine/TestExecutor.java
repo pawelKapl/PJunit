@@ -24,7 +24,7 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        final var results = new int[2];
+        final var results = new TestResults();
         testClasses.forEach(testClazz -> {
             for (Method method : testClazz.getDeclaredMethods()) {
                 Arrays.stream(method.getDeclaredAnnotations())
@@ -32,13 +32,36 @@ final class TestExecutor {
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .forEach(handler -> {
-                            if (handler.handleTest(method, prepareTestClass(testClazz))) results[0]++;
-                            else results[1]++;
+                            if (handler.handleTest(method, prepareTestClass(testClazz))) results.markSuccess();
+                            else results.markFail();
                         });
             }
         });
-        LOGGER.info(format("SUMMARY - Test passed: %d, Tests failed: %d",
-                results[0], results[1]));
+        LOGGER.info(results.toString());
+    }
+
+    private static final class TestResults {
+        private int totalRate = 0;
+        private int successRate = 0;
+        private int failedRate = 0;
+
+        private void markSuccess() {
+            successRate++;
+            totalRate++;
+        }
+
+        private void markFail() {
+            failedRate++;
+            totalRate++;
+        }
+
+        @Override
+        public String toString() {
+            return "\nTEST SUMMARY:\n  " +
+                    "\tTotal tests performed: " + totalRate +
+                    "\n\tTests passed: " + successRate +
+                    "\n\tTests failed: " + failedRate;
+        }
     }
 
     private Object prepareTestClass(Class<?> testClazz) {
