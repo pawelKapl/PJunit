@@ -8,14 +8,18 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 final class TestExecutor {
 
+    private final TestResults testResults;
+
     private static final Logger LOGGER = Logger.getLogger(TestExecutor.class.getSimpleName());
 
     private TestExecutor() {
+        testResults = new TestResults();
     }
 
     static TestExecutor getExecutor() {
@@ -23,20 +27,21 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        final var results = new TestResults();
         testClasses.forEach(testClazz -> {
             for (Method method : testClazz.getDeclaredMethods()) {
                 Arrays.stream(method.getDeclaredAnnotations())
                         .map(TestHandler::getHandler)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
-                        .forEach(handler -> {
-                            if (handler.handleTest(method, prepareTestClass(testClazz))) results.markSuccess();
-                            else results.markFail();
-                        });
+                        .forEach(handler -> runTest(handler, testClazz, method));
             }
         });
-        LOGGER.info(results.toString());
+        LOGGER.log(Level.INFO, "{0}", testResults);
+    }
+
+    private void runTest(TestHandler handler, Class<?> testClazz, Method method) {
+        if (handler.handleTest(method, prepareTestClass(testClazz))) testResults.markSuccess();
+        else testResults.markFail();
     }
 
     private static final class TestResults {

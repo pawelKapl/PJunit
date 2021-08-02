@@ -24,7 +24,8 @@ class TestMain {
 
     private static final Logger LOGGER = Logger.getLogger(TestMain.class.getSimpleName());
 
-    private TestMain() {}
+    private TestMain() {
+    }
 
     public static void main(String[] args) throws MalformedURLException {
         Set<Class<?>> testClasses = getAllTestClasses();
@@ -34,14 +35,14 @@ class TestMain {
     }
 
     private static Set<Class<?>> getAllTestClasses() throws MalformedURLException {
-        URL testClassUrl =  get("target/test-classes").toUri().toURL();
-        URLClassLoader classLoader = newInstance(new URL[]{ testClassUrl }, staticClassLoader());
+        URL testClassUrl = get("target/test-classes").toUri().toURL();
+        URLClassLoader classLoader = newInstance(new URL[]{testClassUrl}, staticClassLoader());
 
         Reflections classFinder = new Reflections(
                 new ConfigurationBuilder()
-                .addUrls(forPackage("", classLoader))
-                .addClassLoader(classLoader)
-                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
+                        .addUrls(forPackage("", classLoader))
+                        .addClassLoader(classLoader)
+                        .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner())
         );
         return classFinder.getTypesAnnotatedWith(PJunitTest.class).stream()
                 .filter(Objects::nonNull)
