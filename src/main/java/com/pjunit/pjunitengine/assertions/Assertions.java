@@ -7,8 +7,10 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 public final class Assertions {
-    private static final AssertionError TRUE_EXPRESSION_EXPECTED = new AssertionError("\n\nExpression resulted with false, expected true!\n");
-    private static final AssertionError FALSE_EXPRESSION_EXPECTED = new AssertionError("\n\nExpression resulted with true, expected false!\n");
+    private static final AssertionError TRUE_EXPRESSION_EXPECTED =
+            new AssertionError("\n\nExpression resulted with false, expected true!\n");
+    private static final AssertionError FALSE_EXPRESSION_EXPECTED =
+            new AssertionError("\n\nExpression resulted with true, expected false!\n");
 
     private Assertions() {}
 
@@ -39,7 +41,14 @@ public final class Assertions {
         if (expected.equals(actual)) return;
 
         throw new AssertionError(
-                format("%nValues are not equal: %n  Expected: %s Actual: %s", expected, actual)
-        );
+                format("%nValues are not equal: %n  Expected: %s Actual: %s", expected, actual));
+    }
+
+    public static void assertObjectEquals(Object expected, Object actual) {
+        requireNonNull(expected);
+        if (expected.equals(actual)) return;
+
+        throw new AssertionError(
+                format("%nObjects are not equal: %n  Expected: %s Actual: %s", expected, actual));
     }
 }

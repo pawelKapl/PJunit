@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 final class TestExecutor {
 
     private final TestResults testResults;
@@ -27,15 +26,16 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        testClasses.forEach(testClazz -> {
-            for (Method method : testClazz.getDeclaredMethods()) {
-                Arrays.stream(method.getDeclaredAnnotations())
-                        .map(TestHandler::getHandler)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .forEach(handler -> runTest(handler, testClazz, method));
-            }
-        });
+        testClasses.forEach(
+                testClazz -> {
+                    for (Method method : testClazz.getDeclaredMethods()) {
+                        Arrays.stream(method.getDeclaredAnnotations())
+                                .map(TestHandler::getHandler)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .forEach(handler -> runTest(handler, testClazz, method));
+                    }
+                });
         LOGGER.log(Level.INFO, "{0}", testResults);
     }
 
@@ -61,10 +61,13 @@ final class TestExecutor {
 
         @Override
         public String toString() {
-            return "\nTEST SUMMARY:\n  " +
-                    "\tTotal tests performed: " + totalRate +
-                    "\n\tTests passed: " + successRate +
-                    "\n\tTests failed: " + failedRate;
+            return "\nTEST SUMMARY:\n  "
+                    + "Total tests performed: "
+                    + totalRate
+                    + "\n\tTests passed: "
+                    + successRate
+                    + "\n\tTests failed: "
+                    + failedRate;
         }
     }
 
@@ -72,19 +75,20 @@ final class TestExecutor {
         Optional<Method> warmup = getWarmupMethodIfDeclared(testClazz);
         try {
             Object testClassInstance = testClazz.getDeclaredConstructor().newInstance();
-            if (warmup.isPresent())
-                warmup.get().invoke(testClassInstance);
+            if (warmup.isPresent()) warmup.get().invoke(testClassInstance);
             return testClassInstance;
         } catch (Exception e) {
-            throw new ClassPreparationException("Error during test class instantiation and/or warmup", e);
+            throw new ClassPreparationException(
+                    "Error during test class instantiation and/or warmup", e);
         }
     }
 
     private Optional<Method> getWarmupMethodIfDeclared(Class<?> testClazz) {
         for (Method method : testClazz.getDeclaredMethods()) {
-            Optional<Annotation> warmupOptional = Arrays.stream(method.getDeclaredAnnotations())
-                    .filter(Warmup.class::isInstance)
-                    .findAny();
+            Optional<Annotation> warmupOptional =
+                    Arrays.stream(method.getDeclaredAnnotations())
+                            .filter(Warmup.class::isInstance)
+                            .findAny();
             if (warmupOptional.isPresent()) return Optional.of(method);
         }
         return Optional.empty();

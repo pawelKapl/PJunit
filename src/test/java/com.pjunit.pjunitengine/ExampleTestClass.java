@@ -54,6 +54,15 @@ public class ExampleTestClass {
         Assertions.assertIsNull(intTestArray[1]);
     }
 
+    @Test
+    public void testIfStringsAreEqual() {
+        //given
+        String s1 = "Test";
+        String s2 = "Te" + "st";
+
+        Assertions.assertObjectEquals(s1, s2);
+    }
+
     @ExceptionTest({NumberFormatException.class})
     public void testIfParsingThrowsNumberFormatException() {
         //given

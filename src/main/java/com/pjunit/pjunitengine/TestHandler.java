@@ -15,7 +15,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
 enum TestHandler {
-
     TEST(Test.class) {
         boolean handleTest(final Method method, final Object testClass) {
             try {
@@ -23,7 +22,11 @@ enum TestHandler {
                 LOGGER.log(Level.INFO, format("Test %s passed!", getFullMethodName(method)));
                 return true;
             } catch (InvocationTargetException e) {
-                LOGGER.log(Level.WARNING, format("Test %s failed, cause: %s", getFullMethodName(method), e.getCause()));
+                LOGGER.log(
+                        Level.WARNING,
+                        format(
+                                "Test %s failed, cause: %s",
+                                getFullMethodName(method), e.getCause()));
                 return false;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -34,10 +37,14 @@ enum TestHandler {
 
     EXCEPTION_TEST(ExceptionTest.class) {
         boolean handleTest(final Method method, final Object testClass) {
-            Class<? extends Exception>[] expectedExceptions = method.getAnnotation(ExceptionTest.class).value();
+            Class<? extends Exception>[] expectedExceptions =
+                    method.getAnnotation(ExceptionTest.class).value();
             try {
                 method.invoke(testClass);
-                LOGGER.warning(format("Test %s failed, no exceptions thrown during execution!", getFullMethodName(method)));
+                LOGGER.warning(
+                        format(
+                                "Test %s failed, no exceptions thrown during execution!",
+                                getFullMethodName(method)));
                 return false;
             } catch (Exception wrappedExc) {
                 for (Class<? extends Exception> e : expectedExceptions) {
@@ -46,11 +53,12 @@ enum TestHandler {
                         return true;
                     }
                 }
-                LOGGER.warning(format("Test %s failed,%n expected exceptions: %s,%n actual exception: %s%n",
-                        getFullMethodName(method),
-                        Arrays.toString(expectedExceptions),
-                        wrappedExc.getCause()
-                ));
+                LOGGER.warning(
+                        format(
+                                "Test %s failed,%n expected exceptions: %s,%n actual exception: %s%n",
+                                getFullMethodName(method),
+                                Arrays.toString(expectedExceptions),
+                                wrappedExc.getCause()));
                 return false;
             }
         }
@@ -74,7 +82,8 @@ enum TestHandler {
 
     static String getFullMethodName(Method method) {
         String className = method.getDeclaringClass().getName();
-        return className.substring(className.lastIndexOf("."))
-                .replace(".","") + "." + method.getName();
+        return className.substring(className.lastIndexOf(".")).replace(".", "")
+                + "."
+                + method.getName();
     }
 }
