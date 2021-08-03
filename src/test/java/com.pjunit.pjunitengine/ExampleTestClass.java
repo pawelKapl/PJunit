@@ -20,13 +20,13 @@ public class ExampleTestClass {
 
     @Test
     public void testIfMathPowReturnsRightValue() {
-        //given
+        // given
         double i = 6;
 
-        //when
+        // when
         double pow = Math.pow(i, 2.0);
 
-        //then
+        // then
         Assertions.assertNumberEquals(36.0, pow);
     }
 
@@ -56,7 +56,7 @@ public class ExampleTestClass {
 
     @Test
     public void testIfStringsAreEqual() {
-        //given
+        // given
         String s1 = "Test";
         String s2 = "Te" + "st";
 
@@ -65,10 +65,10 @@ public class ExampleTestClass {
 
     @ExceptionTest({NumberFormatException.class})
     public void testIfParsingThrowsNumberFormatException() {
-        //given
+        // given
         var integer = "12ef3";
 
-        //when
+        // when
         Integer.parseInt(integer);
     }
 }
