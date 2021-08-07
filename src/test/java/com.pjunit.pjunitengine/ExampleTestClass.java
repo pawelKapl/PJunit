@@ -1,6 +1,7 @@
 package com.pjunit.pjunitengine;
 
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
+import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.PJunitTest;
 import com.pjunit.pjunitengine.annotations.Test;
 import com.pjunit.pjunitengine.annotations.Warmup;
@@ -13,7 +14,7 @@ public class ExampleTestClass {
     private String test;
 
     @Warmup
-    public void SetUp() {
+    public void setUp() {
         intTestArray = new Integer[2];
         test = "String";
     }
@@ -70,5 +71,17 @@ public class ExampleTestClass {
 
         // when
         Integer.parseInt(integer);
+    }
+
+    @MultipleTest(values = {
+        "1.001, true, result",
+        "1.6, true, result",
+        "999, true, testString",
+        "45, true, tt"
+    })
+    public void multipleTest(float a, boolean b, String c) {
+        Assertions.assertTrue(() -> b);
+        Assertions.assertTrue(() -> a > 1);
+        Assertions.assertNotNull(c);
     }
 }

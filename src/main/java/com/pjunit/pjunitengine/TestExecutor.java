@@ -1,11 +1,12 @@
 package com.pjunit.pjunitengine;
 
+import static java.util.Arrays.stream;
+
+import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.exceptions.ClassPreparationException;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -29,18 +30,25 @@ final class TestExecutor {
         testClasses.forEach(
                 testClazz -> {
                     for (Method method : testClazz.getDeclaredMethods()) {
-                        Arrays.stream(method.getDeclaredAnnotations())
+                        if (method.getDeclaredAnnotation(MultipleTest.class) != null) {
+                            stream(method.getDeclaredAnnotation(MultipleTest.class).values())
+                                .forEach(args ->
+                                    runTest(TestHandler.MULTIPLE_TEST, testClazz, method, getStringArgs(args))
+                                );
+                            continue;
+                        }
+                        stream(method.getDeclaredAnnotations())
                                 .map(TestHandler::getHandler)
                                 .filter(Optional::isPresent)
                                 .map(Optional::get)
-                                .forEach(handler -> runTest(handler, testClazz, method));
+                                .forEach(handler -> runTest(handler, testClazz, method, new String[0]));
                     }
                 });
         LOGGER.log(Level.INFO, "{0}", testResults);
     }
 
-    private void runTest(TestHandler handler, Class<?> testClazz, Method method) {
-        if (handler.handleTest(method, prepareTestClass(testClazz))) testResults.markSuccess();
+    private void runTest(TestHandler handler, Class<?> testClazz, Method method, String[] args) {
+        if (handler.handleTest(method, args, prepareTestClass(testClazz))) testResults.markSuccess();
         else testResults.markFail();
     }
 
@@ -86,11 +94,19 @@ final class TestExecutor {
     private Optional<Method> getWarmupMethodIfDeclared(Class<?> testClazz) {
         for (Method method : testClazz.getDeclaredMethods()) {
             Optional<Annotation> warmupOptional =
-                    Arrays.stream(method.getDeclaredAnnotations())
+                    stream(method.getDeclaredAnnotations())
                             .filter(Warmup.class::isInstance)
                             .findAny();
             if (warmupOptional.isPresent()) return Optional.of(method);
         }
         return Optional.empty();
+    }
+
+    private String[] getStringArgs(String value) {
+        String[] args = value.split(",");
+        for (int i = 0; i < args.length; i++) {
+            args[i] = args[i].trim();
+        }
+        return args;
     }
 }
