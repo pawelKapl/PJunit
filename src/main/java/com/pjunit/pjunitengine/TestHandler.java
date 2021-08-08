@@ -104,7 +104,7 @@ enum TestHandler {
             return true;
         }
 
-        private void logCustomTestDescriptionIfPresent(Method method, String[] args) {
+        private void logCustomTestDescriptionIfPresent(Method method, Object[] args) {
             String description = method.getAnnotation(MultipleTest.class).description();
             if (!description.isEmpty()) LOGGER.log(Level.INFO, format(description, args));
         }

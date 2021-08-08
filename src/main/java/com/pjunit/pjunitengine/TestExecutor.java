@@ -27,34 +27,34 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        testClasses.forEach(
-                testClazz -> {
-                    for (Method method : testClazz.getDeclaredMethods()) {
-                        if (method.getDeclaredAnnotation(MultipleTest.class) != null) {
-                            stream(method.getDeclaredAnnotation(MultipleTest.class).values())
-                                    .forEach(
-                                            args ->
-                                                    runTest(
-                                                            TestHandler.MULTIPLE_TEST,
-                                                            testClazz,
-                                                            method,
-                                                            getStringArgs(args)));
-                        } else {
-                            stream(method.getDeclaredAnnotations())
-                                    .map(TestHandler::getHandler)
-                                    .filter(Optional::isPresent)
-                                    .map(Optional::get)
-                                    .forEach(
-                                            handler ->
-                                                    runTest(
-                                                            handler,
-                                                            testClazz,
-                                                            method,
-                                                            new String[0]));
-                        }
-                    }
-                });
+        for (Class<?> testClazz : testClasses)
+            stream(testClazz.getDeclaredMethods())
+                    .forEach(
+                            testMethod -> {
+                                if (testMethod.getDeclaredAnnotation(MultipleTest.class) != null)
+                                    runMultipleTest(testClazz, testMethod);
+                                else runSingleTest(testClazz, testMethod);
+                            });
         LOGGER.log(Level.INFO, "{0}", testResults);
+    }
+
+    private void runSingleTest(Class<?> testClazz, Method method) {
+        stream(method.getDeclaredAnnotations())
+                .map(TestHandler::getHandler)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(handler -> runTest(handler, testClazz, method, new String[0]));
+    }
+
+    private void runMultipleTest(Class<?> testClazz, Method method) {
+        stream(method.getDeclaredAnnotation(MultipleTest.class).values())
+                .forEach(
+                        argsString ->
+                                runTest(
+                                        TestHandler.MULTIPLE_TEST,
+                                        testClazz,
+                                        method,
+                                        getArgsArray(argsString)));
     }
 
     private void runTest(TestHandler handler, Class<?> testClazz, Method method, String[] args) {
@@ -113,7 +113,7 @@ final class TestExecutor {
         return Optional.empty();
     }
 
-    private String[] getStringArgs(String value) {
+    private String[] getArgsArray(String value) {
         String[] args = value.split(",");
         for (int i = 0; i < args.length; i++) {
             args[i] = args[i].trim();
