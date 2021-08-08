@@ -32,23 +32,34 @@ final class TestExecutor {
                     for (Method method : testClazz.getDeclaredMethods()) {
                         if (method.getDeclaredAnnotation(MultipleTest.class) != null) {
                             stream(method.getDeclaredAnnotation(MultipleTest.class).values())
-                                .forEach(args ->
-                                    runTest(TestHandler.MULTIPLE_TEST, testClazz, method, getStringArgs(args))
-                                );
-                            continue;
+                                    .forEach(
+                                            args ->
+                                                    runTest(
+                                                            TestHandler.MULTIPLE_TEST,
+                                                            testClazz,
+                                                            method,
+                                                            getStringArgs(args)));
+                        } else {
+                            stream(method.getDeclaredAnnotations())
+                                    .map(TestHandler::getHandler)
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .forEach(
+                                            handler ->
+                                                    runTest(
+                                                            handler,
+                                                            testClazz,
+                                                            method,
+                                                            new String[0]));
                         }
-                        stream(method.getDeclaredAnnotations())
-                                .map(TestHandler::getHandler)
-                                .filter(Optional::isPresent)
-                                .map(Optional::get)
-                                .forEach(handler -> runTest(handler, testClazz, method, new String[0]));
                     }
                 });
         LOGGER.log(Level.INFO, "{0}", testResults);
     }
 
     private void runTest(TestHandler handler, Class<?> testClazz, Method method, String[] args) {
-        if (handler.handleTest(method, args, prepareTestClass(testClazz))) testResults.markSuccess();
+        if (handler.handleTest(method, args, prepareTestClass(testClazz)))
+            testResults.markSuccess();
         else testResults.markFail();
     }
 
