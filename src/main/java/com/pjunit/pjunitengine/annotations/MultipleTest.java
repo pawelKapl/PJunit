@@ -16,4 +16,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface MultipleTest {
     String[] values();
+    String description() default "";
 }

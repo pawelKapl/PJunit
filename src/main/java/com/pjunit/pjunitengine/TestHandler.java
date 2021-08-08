@@ -80,6 +80,7 @@ enum TestHandler {
                                 method.getName(), args.length, parameters.length));
                 return false;
             }
+            logCustomTestDescriptionIfPresent(method, args);
             try {
                 method.invoke(testClass, getMethodArgs(parameters, args));
             } catch (Exception e) {
@@ -101,6 +102,19 @@ enum TestHandler {
                             "Test %s for args: %s passed!",
                             getFullMethodName(method), Arrays.toString(args)));
             return true;
+        }
+
+        private void logCustomTestDescriptionIfPresent(Method method, String[] args) {
+            String description = method.getAnnotation(MultipleTest.class).description();
+            if (!description.isEmpty()) LOGGER.log(Level.INFO, format(description, args));
+        }
+
+        private Object[] getMethodArgs(Parameter[] parameters, String[] args) {
+            var methodArgs = new Object[parameters.length];
+            for (int i = 0; i < parameters.length; i++) {
+                methodArgs[i] = parseParam(parameters[i].getType(), args[i]);
+            }
+            return methodArgs;
         }
     };
 
@@ -124,13 +138,5 @@ enum TestHandler {
         String className = method.getDeclaringClass().getName();
         className = className.substring(className.lastIndexOf(".")).replace(".", "");
         return format("%s.%s", className, method.getName());
-    }
-
-    private static Object[] getMethodArgs(Parameter[] parameters, String[] args) {
-        var methodArgs = new Object[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            methodArgs[i] = parseParam(parameters[i].getType(), args[i]);
-        }
-        return methodArgs;
     }
 }

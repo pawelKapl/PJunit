@@ -73,15 +73,17 @@ public class ExampleTestClass {
         Integer.parseInt(integer);
     }
 
-    @MultipleTest(values = {
-        "1.001, true, result",
-        "1.6, true, result",
-        "999, true, testString",
-        "45, true, tt"
-    })
-    public void multipleTest(float a, boolean b, String c) {
-        Assertions.assertTrue(() -> b);
-        Assertions.assertTrue(() -> a > 1);
-        Assertions.assertNotNull(c);
+    @MultipleTest(
+            description = "For given number %s and string %s, should return %s",
+            values = {
+                "1.001, test, true",
+                "1.6, test, true",
+                "0.99, test, false",
+                "-999, test, false",
+                "45, test, true"
+            })
+    public void multipleTest(float a, String b, boolean c) {
+        Assertions.assertNotNull(b);
+        Assertions.assertTrue(() -> a > 1 == c);
     }
 }
