@@ -7,6 +7,7 @@ import com.pjunit.pjunitengine.annotations.Test;
 import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.assertions.Assertions;
 import com.pjunit.pjunitengine.assertions.Helpers;
+import java.time.Duration;
 
 @PJunitTest
 public class ExampleTestClass {
@@ -83,7 +84,7 @@ public class ExampleTestClass {
         var throwable = Helpers.captureException(() -> Integer.parseInt(integer));
 
         // then
-        Assertions.assertTrue(() -> throwable instanceof NumberFormatException);
+        Assertions.assertExceptionEquals(NumberFormatException.class, throwable);
     }
 
     @Test
@@ -92,7 +93,7 @@ public class ExampleTestClass {
         Object i = 12;
         Integer ii = null;
 
-        Assertions.assertThrows(() -> ((Double) i).floatValue(), ClassCastException.class);
+        Assertions.assertThrows(ClassCastException.class, () -> ((Double) i).floatValue());
     }
 
     @MultipleTest(
@@ -107,5 +108,18 @@ public class ExampleTestClass {
     public void multipleTest(float a, String b, boolean c) {
         Assertions.assertNotNull(b);
         Assertions.assertTrue(() -> a > 1 == c);
+    }
+
+    @Test
+    public void testCodeExecutionTimeNoLongedThan() {
+        Assertions.assertProcessLastNoLongerThan(
+                () -> {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                },
+                Duration.ofMillis(300));
     }
 }

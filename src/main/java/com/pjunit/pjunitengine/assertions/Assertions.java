@@ -1,5 +1,6 @@
 package com.pjunit.pjunitengine.assertions;
 
+import java.time.Duration;
 import java.util.function.BooleanSupplier;
 
 import static java.lang.String.format;
@@ -61,17 +62,18 @@ public final class Assertions {
         }
     }
 
-    public static void assertExceptionEquals(Class<? extends Throwable> expected, Throwable actual) {
+    public static void assertExceptionEquals(
+            Class<? extends Throwable> expected, Throwable actual) {
         if (!expected.isInstance(actual)) {
             throw new AssertionError(
-                format(
-                    "%nExceptions are different,%n expected exception: %s,%n actual exception: %s%n",
-                    expected.getName(), actual.getClass().getName()));
+                    format(
+                            "%nExceptions are different,%n expected exception: %s,%n actual exception: %s%n",
+                            expected.getName(), actual.getClass().getName()));
         }
     }
 
     public static void assertThrows(
-            Runnable runnable, Class<? extends Throwable> expectedException) {
+            Class<? extends Throwable> expectedException, Runnable runnable) {
         boolean noExc = false;
         try {
             runnable.run();
@@ -85,5 +87,18 @@ public final class Assertions {
                     format(
                             "%nExpression not resulting with any exception! Expected: %s",
                             expectedException.getName()));
+    }
+
+    public static void assertProcessLastNoLongerThan(Runnable process, Duration duration) {
+
+        long start = System.currentTimeMillis();
+        process.run();
+        long end = System.currentTimeMillis();
+        if (end - start > duration.toMillis()) {
+            throw new AssertionError(
+                    format(
+                            "%nCode execution took longer than expected: expected %dms, actual %dms",
+                            duration.toMillis(), end - start));
+        }
     }
 }
