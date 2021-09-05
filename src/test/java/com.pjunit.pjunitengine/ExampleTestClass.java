@@ -6,6 +6,7 @@ import com.pjunit.pjunitengine.annotations.PJunitTest;
 import com.pjunit.pjunitengine.annotations.Test;
 import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.assertions.Assertions;
+import com.pjunit.pjunitengine.assertions.Helpers;
 
 @PJunitTest
 public class ExampleTestClass {
@@ -71,6 +72,27 @@ public class ExampleTestClass {
 
         // when
         Integer.parseInt(integer);
+    }
+
+    @Test
+    public void testIfProperExceptionThrown() {
+        // given
+        var integer = "12ef3";
+
+        // when
+        var throwable = Helpers.captureException(() -> Integer.parseInt(integer));
+
+        // then
+        Assertions.assertTrue(() -> throwable instanceof NumberFormatException);
+    }
+
+    @Test
+    public void testIfProperExceptionThrownCCE() {
+        // given
+        Object i = 12;
+        Integer ii = null;
+
+        Assertions.assertThrows(() -> ((Double) i).floatValue(), ClassCastException.class);
     }
 
     @MultipleTest(

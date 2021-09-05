@@ -51,4 +51,39 @@ public final class Assertions {
         throw new AssertionError(
                 format("%nObjects are not equal: %n  Expected: %s Actual: %s", expected, actual));
     }
+
+    public static void assertExceptionEquals(Throwable expected, Throwable actual) {
+        if (!(expected.getClass().equals(actual.getClass()))) {
+            throw new AssertionError(
+                    format(
+                            "%nExceptions are different,%n expected exception: %s,%n actual exception: %s%n",
+                            expected.getClass().getName(), actual.getClass().getName()));
+        }
+    }
+
+    public static void assertExceptionEquals(Class<? extends Throwable> expected, Throwable actual) {
+        if (!expected.isInstance(actual)) {
+            throw new AssertionError(
+                format(
+                    "%nExceptions are different,%n expected exception: %s,%n actual exception: %s%n",
+                    expected.getName(), actual.getClass().getName()));
+        }
+    }
+
+    public static void assertThrows(
+            Runnable runnable, Class<? extends Throwable> expectedException) {
+        boolean noExc = false;
+        try {
+            runnable.run();
+            noExc = true;
+        } catch (Throwable e) {
+            assertExceptionEquals(expectedException, e);
+        }
+
+        if (noExc)
+            throw new AssertionError(
+                    format(
+                            "%nExpression not resulting with any exception! Expected: %s",
+                            expectedException.getName()));
+    }
 }
