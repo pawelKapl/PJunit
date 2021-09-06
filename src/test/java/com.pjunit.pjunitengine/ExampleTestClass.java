@@ -1,6 +1,6 @@
 package com.pjunit.pjunitengine;
 
-import com.pjunit.pjunitengine.annotations.CustomName;
+import com.pjunit.pjunitengine.annotations.AdditionalLog;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.PJunitTest;
@@ -10,6 +10,7 @@ import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.assertions.Assertions;
 import com.pjunit.pjunitengine.assertions.Helpers;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 @PJunitTest
 public class ExampleTestClass {
@@ -54,7 +55,7 @@ public class ExampleTestClass {
         Assertions.assertNotNull(test);
     }
 
-    @CustomName(value = "************** That Test! ***************")
+    @AdditionalLog(value = "************** That Test! ***************")
     @Test
     public void testIfObjectIsNull() {
         Assertions.assertIsNull(intTestArray[1]);
@@ -117,12 +118,12 @@ public class ExampleTestClass {
         Assertions.assertProcessLastNoLongerThan(
                 () -> {
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(280);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 },
-                Duration.ofMillis(300));
+                300, TimeUnit.MILLISECONDS);
     }
 
     @Skip

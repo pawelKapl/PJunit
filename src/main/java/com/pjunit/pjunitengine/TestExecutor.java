@@ -30,18 +30,18 @@ final class TestExecutor {
     void executeAllTests(Set<Class<?>> testClasses) {
 
         testClasses.stream()
-                .filter(this::isTestClassNotSkipped)
+                .filter(this::isNotSkipped)
                 .flatMap(testClazz -> stream(testClazz.getDeclaredMethods()))
-                .filter(this::isTestMethodNotSkipped)
+                .filter(this::isNotSkipped)
                 .forEach(this::handleTestMethod);
         LOGGER.log(Level.INFO, "{0}", testResults);
     }
 
-    private boolean isTestClassNotSkipped(Class<?> testClass) {
+    private boolean isNotSkipped(Class<?> testClass) {
         return testClass.getDeclaredAnnotation(Skip.class) == null;
     }
 
-    private boolean isTestMethodNotSkipped(Method testMethod) {
+    private boolean isNotSkipped(Method testMethod) {
         return testMethod.getDeclaredAnnotation(Skip.class) == null;
     }
 

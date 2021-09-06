@@ -1,6 +1,13 @@
 package com.pjunit.pjunitengine.assertions;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BooleanSupplier;
 
 import static java.lang.String.format;
@@ -89,16 +96,19 @@ public final class Assertions {
                             expectedException.getName()));
     }
 
-    public static void assertProcessLastNoLongerThan(Runnable process, Duration duration) {
+    public static void assertProcessLastNoLongerThan(
+            Runnable process, long duration, TimeUnit unit) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> runningProcess = executor.submit(process);
 
-        long start = System.currentTimeMillis();
-        process.run();
-        long end = System.currentTimeMillis();
-        if (end - start > duration.toMillis()) {
+        try {
+            runningProcess.get(duration, unit);
+        } catch (Exception e) {
             throw new AssertionError(
-                    format(
-                            "%nCode execution took longer than expected: expected %dms, actual %dms",
-                            duration.toMillis(), end - start));
+                    format("%nCode execution took longer than: %d%s", duration, unit));
+        } finally {
+            runningProcess.cancel(true);
+            executor.shutdown();
         }
     }
 }

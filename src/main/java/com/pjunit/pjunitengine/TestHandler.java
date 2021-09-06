@@ -4,7 +4,7 @@ import static com.pjunit.pjunitengine.ArgsParser.parseParam;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
-import com.pjunit.pjunitengine.annotations.CustomName;
+import com.pjunit.pjunitengine.annotations.AdditionalLog;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.Test;
@@ -144,9 +144,9 @@ enum TestHandler {
     }
 
     static void printCustomMessageIfPresent(Method testMethod) {
-        CustomName customName = testMethod.getDeclaredAnnotation(CustomName.class);
-        if (customName != null) {
-            LOGGER.log(Level.INFO, customName.value());
+        AdditionalLog additionalLog = testMethod.getDeclaredAnnotation(AdditionalLog.class);
+        if (additionalLog != null) {
+            LOGGER.log(Level.INFO, additionalLog.value());
         }
     }
 }
