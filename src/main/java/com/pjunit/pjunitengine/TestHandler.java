@@ -4,6 +4,7 @@ import static com.pjunit.pjunitengine.ArgsParser.parseParam;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 
+import com.pjunit.pjunitengine.annotations.CustomName;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.Test;
@@ -20,6 +21,7 @@ enum TestHandler {
     TEST(Test.class) {
         boolean handleTest(final Method method, final String[] args, final Object testClass) {
             try {
+                printCustomMessageIfPresent(method);
                 method.invoke(testClass);
                 LOGGER.log(Level.INFO, "Test {0} passed!", getFullMethodName(method));
                 return true;
@@ -43,6 +45,7 @@ enum TestHandler {
             Class<? extends Exception>[] expectedExceptions =
                     method.getAnnotation(ExceptionTest.class).value();
             try {
+                printCustomMessageIfPresent(method);
                 method.invoke(testClass);
                 LOGGER.log(
                         Level.WARNING,
@@ -138,5 +141,12 @@ enum TestHandler {
         String className = method.getDeclaringClass().getName();
         className = className.substring(className.lastIndexOf(".")).replace(".", "");
         return format("%s.%s", className, method.getName());
+    }
+
+    static void printCustomMessageIfPresent(Method testMethod) {
+        CustomName customName = testMethod.getDeclaredAnnotation(CustomName.class);
+        if (customName != null) {
+            LOGGER.log(Level.INFO, customName.value());
+        }
     }
 }

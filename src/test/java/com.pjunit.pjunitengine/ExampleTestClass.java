@@ -1,8 +1,10 @@
 package com.pjunit.pjunitengine;
 
+import com.pjunit.pjunitengine.annotations.CustomName;
 import com.pjunit.pjunitengine.annotations.ExceptionTest;
 import com.pjunit.pjunitengine.annotations.MultipleTest;
 import com.pjunit.pjunitengine.annotations.PJunitTest;
+import com.pjunit.pjunitengine.annotations.Skip;
 import com.pjunit.pjunitengine.annotations.Test;
 import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.assertions.Assertions;
@@ -52,6 +54,7 @@ public class ExampleTestClass {
         Assertions.assertNotNull(test);
     }
 
+    @CustomName(value = "************** That Test! ***************")
     @Test
     public void testIfObjectIsNull() {
         Assertions.assertIsNull(intTestArray[1]);
@@ -91,7 +94,6 @@ public class ExampleTestClass {
     public void testIfProperExceptionThrownCCE() {
         // given
         Object i = 12;
-        Integer ii = null;
 
         Assertions.assertThrows(ClassCastException.class, () -> ((Double) i).floatValue());
     }
@@ -122,4 +124,8 @@ public class ExampleTestClass {
                 },
                 Duration.ofMillis(300));
     }
+
+    @Skip
+    @Test
+    public void skippedTest() {}
 }

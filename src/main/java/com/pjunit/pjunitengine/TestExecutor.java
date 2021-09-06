@@ -3,6 +3,7 @@ package com.pjunit.pjunitengine;
 import static java.util.Arrays.stream;
 
 import com.pjunit.pjunitengine.annotations.MultipleTest;
+import com.pjunit.pjunitengine.annotations.Skip;
 import com.pjunit.pjunitengine.annotations.Warmup;
 import com.pjunit.pjunitengine.exceptions.ClassPreparationException;
 import java.lang.annotation.Annotation;
@@ -27,67 +28,52 @@ final class TestExecutor {
     }
 
     void executeAllTests(Set<Class<?>> testClasses) {
-        for (Class<?> testClazz : testClasses)
-            stream(testClazz.getDeclaredMethods())
-                    .forEach(
-                            testMethod -> {
-                                if (testMethod.getDeclaredAnnotation(MultipleTest.class) != null)
-                                    runMultipleTest(testClazz, testMethod);
-                                else runSingleTest(testClazz, testMethod);
-                            });
+
+        testClasses.stream()
+                .filter(this::isTestClassNotSkipped)
+                .flatMap(testClazz -> stream(testClazz.getDeclaredMethods()))
+                .filter(this::isTestMethodNotSkipped)
+                .forEach(this::handleTestMethod);
         LOGGER.log(Level.INFO, "{0}", testResults);
     }
 
-    private void runSingleTest(Class<?> testClazz, Method method) {
+    private boolean isTestClassNotSkipped(Class<?> testClass) {
+        return testClass.getDeclaredAnnotation(Skip.class) == null;
+    }
+
+    private boolean isTestMethodNotSkipped(Method testMethod) {
+        return testMethod.getDeclaredAnnotation(Skip.class) == null;
+    }
+
+    private void handleTestMethod(Method testMethod) {
+        if (testMethod.getDeclaredAnnotation(MultipleTest.class) != null)
+            prepareMultipleTest(testMethod);
+        else prepareSingleTest(testMethod);
+    }
+
+    private void prepareSingleTest(Method method) {
         stream(method.getDeclaredAnnotations())
                 .map(TestHandler::getHandler)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .forEach(handler -> runTest(handler, testClazz, method, new String[0]));
+                .forEach(
+                        handler ->
+                                runTest(
+                                        handler,
+                                        prepareTestClass(method.getDeclaringClass()),
+                                        method,
+                                        new String[0]));
     }
 
-    private void runMultipleTest(Class<?> testClazz, Method method) {
+    private void prepareMultipleTest(Method method) {
         stream(method.getDeclaredAnnotation(MultipleTest.class).values())
                 .forEach(
                         argsString ->
                                 runTest(
                                         TestHandler.MULTIPLE_TEST,
-                                        testClazz,
+                                        prepareTestClass(method.getDeclaringClass()),
                                         method,
                                         getArgsArray(argsString)));
-    }
-
-    private void runTest(TestHandler handler, Class<?> testClazz, Method method, String[] args) {
-        if (handler.handleTest(method, args, prepareTestClass(testClazz)))
-            testResults.markSuccess();
-        else testResults.markFail();
-    }
-
-    private static final class TestResults {
-        private int totalRate = 0;
-        private int successRate = 0;
-        private int failedRate = 0;
-
-        private void markSuccess() {
-            successRate++;
-            totalRate++;
-        }
-
-        private void markFail() {
-            failedRate++;
-            totalRate++;
-        }
-
-        @Override
-        public String toString() {
-            return "\nTEST SUMMARY:\n  "
-                    + "Total tests performed: "
-                    + totalRate
-                    + "\n\tTests passed: "
-                    + successRate
-                    + "\n\tTests failed: "
-                    + failedRate;
-        }
     }
 
     private Object prepareTestClass(Class<?> testClazz) {
@@ -119,5 +105,37 @@ final class TestExecutor {
             args[i] = args[i].trim();
         }
         return args;
+    }
+
+    private void runTest(TestHandler handler, Object testInstance, Method method, String[] args) {
+        if (handler.handleTest(method, args, testInstance)) testResults.markSuccess();
+        else testResults.markFail();
+    }
+
+    private static final class TestResults {
+        private int totalRate = 0;
+        private int successRate = 0;
+        private int failedRate = 0;
+
+        private void markSuccess() {
+            successRate++;
+            totalRate++;
+        }
+
+        private void markFail() {
+            failedRate++;
+            totalRate++;
+        }
+
+        @Override
+        public String toString() {
+            return "\nTEST SUMMARY:\n  "
+                    + "Total tests performed: "
+                    + totalRate
+                    + "\n\tTests passed: "
+                    + successRate
+                    + "\n\tTests failed: "
+                    + failedRate;
+        }
     }
 }
